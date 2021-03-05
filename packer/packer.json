@@ -1,0 +1,24 @@
+{
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "../ansible/play.yml"
+    },
+    {
+      "type": "file",
+      "source" : "./ansible/index.html",
+      "destination" : "/var/www/html/index.html"
+
+    }
+  ],
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "us-east-2",
+      "source_ami": "ami-016b213e65284e9c9",
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "nginx-packer {{timestamp}}"
+    }
+  ]
+}
