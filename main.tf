@@ -56,7 +56,7 @@ resource aws_key_pair "pub_key"{
   public_key = file("./devopscorner.pub")
 }
 resource "aws_instance" "pub_bastion" {
-  ami = data.aws_ami.amazon-linux-2.id
+  ami = "ami-09246ddb00c7c4fef"
   associate_public_ip_address = true
   instance_type = "t2.micro"
   key_name = aws_key_pair.pub_key.key_name
@@ -74,6 +74,12 @@ resource "aws_security_group" "pub_sg" {
     protocol = "tcp"
     to_port = 22
     cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
+  }
+  egress {
+    from_port = 0
+    protocol = "-1"
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/32"]
   }
 }
 
