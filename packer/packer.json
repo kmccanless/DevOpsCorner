@@ -3,12 +3,6 @@
     {
       "type": "ansible",
       "playbook_file": "../ansible/play.yml"
-    },
-    {
-      "type": "file",
-      "source" : "./ansible/index.html",
-      "destination" : "/var/www/html/index.html"
-
     }
   ],
   "builders": [

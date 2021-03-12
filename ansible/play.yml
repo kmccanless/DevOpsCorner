@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: all
   become: yes
   become_user: root
   tasks:
@@ -13,4 +13,7 @@
       service:
         name: httpd
         state: started
-
+    - name: copy file
+      copy:
+        src: "../ansible/index.html"
+        dest: "/var/www/html/index.html"
