@@ -13,9 +13,3 @@ variable "az_count" {
     type = number
     default = 1
 }
-
-variable "availability_zones" {
-    description = "Availability zones that will be assigned to resources"
-    type = list
-    default = ["us-east-2a","us-east-2b"]
-}
