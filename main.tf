@@ -36,7 +36,7 @@ resource "aws_route_table" "public_route_table" {
 resource "aws_route_table_association" "rt_association" {
   count = length(var.availibility_zones)
   route_table_id = aws_route_table.public_route_table.id
-  subnet_id = module.vpc.public_subnet_ids[count.index]
+  subnet_id = module.vpc.public_subnets[count.index].id
 }
 resource "aws_subnet" "private" {
   cidr_block = "10.0.3.0/24"
@@ -84,7 +84,7 @@ resource "aws_autoscaling_group" "pub_asg" {
   min_size = 2
   desired_capacity = 2
   launch_configuration = aws_launch_configuration.pub_lc.name
-  vpc_zone_identifier = module.vpc.public_subnet_ids
+  vpc_zone_identifier = module.vpc.public_subnets.*.id
 }
 
 resource "aws_security_group" "pub_sg" {
