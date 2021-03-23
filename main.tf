@@ -16,28 +16,18 @@ data "http" "myip" {
   url = "http://icanhazip.com"
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  tags = {
-    Name = "DevOps-Corner"
-  }
+module "vpc" {
+  source = "./modules/vpc"
+  az_count = 2
+  cidr_block  = "10.0.0.0/16"
+  cidr_blocks = ["10.0.1.0/24","10.0.2.0/24"]
 }
-resource "aws_subnet" "public" {
-  count = length(var.availibility_zones)
-  cidr_block = var.cidr_blocks[count.index]
-  vpc_id = aws_vpc.main.id
-  availability_zone = var.availibility_zones[count.index]
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "public"
-    Zone = var.availibility_zones[count.index]
-  }
-}
+
 resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
 }
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
@@ -46,12 +36,12 @@ resource "aws_route_table" "public_route_table" {
 resource "aws_route_table_association" "rt_association" {
   count = length(var.availibility_zones)
   route_table_id = aws_route_table.public_route_table.id
-  subnet_id = aws_subnet.public[count.index].id
+  subnet_id = module.vpc.public_subnets[count.index].id
 }
 resource "aws_subnet" "private" {
   cidr_block = "10.0.3.0/24"
   availability_zone = "us-east-2b"
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
   tags = {
     Name = "private"
   }
@@ -70,7 +60,7 @@ resource aws_key_pair "pub_key"{
 //  tags = {
 //    Name = "DevOpsCorner-Pub"
 //  }
-//  subnet_id = aws_subnet.public[count.index].id
+//  subnet_id = module.vpc.public_subnet_ids[count.index]
 //}
 //resource "aws_instance" "db_server" {
 //  ami = "ami-07a0844029df33d7d"
@@ -94,11 +84,12 @@ resource "aws_autoscaling_group" "pub_asg" {
   min_size = 2
   desired_capacity = 2
   launch_configuration = aws_launch_configuration.pub_lc.name
-  vpc_zone_identifier = aws_subnet.public.*.id
+  vpc_zone_identifier = module.vpc.public_subnets.*.id
 }
+
 resource "aws_security_group" "pub_sg" {
   name = "devopscorner-pub-sg"
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
   ingress {
     from_port = 22
     protocol = "tcp"
@@ -121,7 +112,7 @@ resource "aws_security_group" "pub_sg" {
 
 resource "aws_security_group" "db_sg" {
   name = "devopscorner-app-sg"
-  vpc_id = aws_vpc.main.id
+  vpc_id = module.vpc.vpc_id
   ingress {
     security_groups = [aws_security_group.pub_sg.id]
     from_port = 3306
