@@ -3,6 +3,8 @@
 # Local .terraform directories
 **/.terraform/*
 
+assets/devopscorner
+assets/devopscorner.pub
 # .tfstate files
 *.tfstate
 *.tfstate.*
