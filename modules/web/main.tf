@@ -4,7 +4,7 @@ data "http" "myip" {
 
 resource "aws_launch_configuration" "pub_lc" {
   image_id = "ami-07a0844029df33d7d"
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   key_name = aws_key_pair.pub_key.key_name
   security_groups = [aws_security_group.pub_sg.id]
 }
@@ -40,4 +40,23 @@ resource "aws_security_group" "pub_sg" {
     to_port = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_autoscaling_notification" "asg_event" {
+  group_names = [aws_autoscaling_group.pub_asg.name]
+  notifications = [
+    "autoscaling:EC2_INSTANCE_LAUNCH",
+    "autoscaling:EC2_INSTANCE_TERMINATE",
+    "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+    "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+  ]
+  topic_arn = aws_sns_topic.asg_sns_topic.arn
+}
+resource "aws_sns_topic" "asg_sns_topic" {
+  name = "autoscaling-event"
+}
+resource "aws_sns_topic_subscription" "asg_subscription" {
+  endpoint = "+11235551212"
+  protocol = "sms"
+  topic_arn = aws_sns_topic.asg_sns_topic.arn
 }
