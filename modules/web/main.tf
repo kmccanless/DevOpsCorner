@@ -13,7 +13,7 @@ resource "aws_autoscaling_group" "pub_asg" {
   min_size = 2
   desired_capacity = 2
   launch_configuration = aws_launch_configuration.pub_lc.name
-  vpc_zone_identifier = .vpc.public_subnets.*.id
+  vpc_zone_identifier = var.public_subnets.*.id
 }
 resource aws_key_pair "pub_key"{
   key_name = "devopscorner"

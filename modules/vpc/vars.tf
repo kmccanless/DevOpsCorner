@@ -3,7 +3,12 @@ variable "cidr_block" {
     type = string
 }
 
-variable "cidr_blocks" {
+variable "private_cidr_blocks" {
+    description = "A list of the cidr blocks to assign to subnets"
+    type = list
+}
+
+variable "public_cidr_blocks" {
     description = "A list of the cidr blocks to assign to subnets"
     type = list
 }
