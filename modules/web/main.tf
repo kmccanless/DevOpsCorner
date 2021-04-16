@@ -13,15 +13,15 @@ resource "aws_autoscaling_group" "pub_asg" {
   min_size = 2
   desired_capacity = 2
   launch_configuration = aws_launch_configuration.pub_lc.name
-  vpc_zone_identifier = .vpc.public_subnets.*.id
+  vpc_zone_identifier = var.public_subnet_ids
 }
-resource aws_key_pair "pub_key"{
+resource aws_key_pair "pub_key" {
   key_name = "devopscorner"
-  public_key = file("./devopscorner.pub")
+  public_key = file("../../../assets/devopscorner.pub")
 }
 resource "aws_security_group" "pub_sg" {
   name = "devopscorner-pub-sg"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id
   ingress {
     from_port = 22
     protocol = "tcp"
