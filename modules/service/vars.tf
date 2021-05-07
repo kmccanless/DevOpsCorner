@@ -1,0 +1,9 @@
+variable "cluster_id" {}
+variable "container_name" {}
+variable "container_port" {}
+variable "vpc_id" {}
+variable "lb_target_group_arn" {}
+variable "lb_sg_id" {}
+variable "service_subnets" {}
+variable "td_arn" {}
+variable "desired_count" {}
